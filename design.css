@@ -34,8 +34,8 @@ body::before {
     url("blue-futuristic-networking-technology_53876-97395 (1).jpeg");
     background-size: cover;
     background-position: center;
-    background-repeat: no-repeat
-
+    background-repeat: no-repeat;
+    z-index: 0;
 }
 
 /* ─── SCROLLBAR ──────────────────────────────────────────── */
@@ -221,53 +221,173 @@ section {
     color: var(--bg);
 }
 
-/* ─── HOME IMAGE PLACEHOLDER ─────────────────────────────── */
-.home-image {
+/* ═══════════════════════════════════════════════════════════
+   MODERN HEXAGONAL PHOTO FRAME
+   ═══════════════════════════════════════════════════════════ */
+
+.home-image-wrap {
     flex-shrink: 0;
-    width: 500px;
-    height: 700px;
-    border: 2px dashed var(--border);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface);
     position: relative;
-    overflow: hidden;
+    width: 340px;
+    height: 400px;
 }
 
-.home-image img {
-    width: 100%;
-    height: 100%;        
-    object-fit: cover;  
-}
-
-
-.home-image::before {
-    content: '';
+/* The SVG hex border sits on top */
+.hex-svg {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(0,230,118,.04) 0%, transparent 60%);
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    /* Slow rotation gives a "live sensor" feel */
+    animation: hexSpin 20s linear infinite;
 }
 
-.placeholder-icon { font-size: 48px; margin-bottom: 12px; }
+@keyframes hexSpin {
+    from { transform: rotate(0deg);   }
+    to   { transform: rotate(360deg); }
+}
 
-.placeholder-text {
+/* Actual photo, clipped to hex shape */
+.hex-photo {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(50% 2%, 96.5% 26% , 96.5% 74%, 50% 98%, 3.5% 74%, 3.5% 26%);
+    overflow: hidden;
+    z-index: 2;
+    background: var(--surface);
+}
+
+.hex-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+    display: block;
+    /* Slight zoom on hover via parent */
+    transition: transform .5s ease;
+}
+
+.home-image-wrap:hover .hex-photo img {
+    transform: scale(1.04);
+}
+
+/* Animated scan line */
+.hex-scan {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, rgba(0,230,118,0.6) 40%, rgba(0,188,212,0.6) 60%, transparent 100%);
+    top: 5%;
+    animation: scanMove 3.5s ease-in-out infinite;
+    z-index: 4;
+}
+
+@keyframes scanMove {
+    0%   { top: 5%;  opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 93%; opacity: 0; }
+}
+
+/* Bottom gradient fade on photo */
+.hex-fade {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(to top, rgba(5,13,8,0.7) 0%, transparent 100%);
+    z-index: 3;
+}
+
+/* Floating badge — top left */
+.photo-badge {
+    position: absolute;
+    z-index: 5;
+    background: rgba(5, 13, 8, 0.88);
+    border: 1px solid var(--border);
+    border-radius: 4px;
     font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 2px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-    padding: 0 20px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
 }
 
-.placeholder-hint {
-    margin-top: 8px;
-    font-size: 10px;
-    color: var(--border);
+.photo-badge--tl {
+    top: 24px;
+    left: -20px;
+    animation: floatY 3s ease-in-out infinite;
+}
+
+.photo-badge--br {
+    bottom: 28px;
+    right: -20px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 10px 16px;
     text-align: center;
+    animation: floatY 3.6s ease-in-out infinite reverse;
+}
+
+@keyframes floatY {
+    0%, 100% { transform: translateY(0);    }
+    50%       { transform: translateY(-6px); }
+}
+
+.badge-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1);   }
+    50%       { opacity: .4; transform: scale(.7); }
+}
+
+.badge-num {
+    font-family: var(--font-head);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+}
+
+.badge-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+}
+
+/* Decorative L-shaped corner lines */
+.deco-line {
+    position: absolute;
+    z-index: 4;
+}
+
+.deco-line--tl {
+    top: -10px; left: 10px;
+    width: 36px; height: 36px;
+    border-top: 1px solid var(--accent);
+    border-left: 1px solid var(--accent);
+    opacity: 0.4;
+}
+
+.deco-line--br {
+    bottom: -10px; right: 10px;
+    width: 36px; height: 36px;
+    border-bottom: 1px solid var(--accent2);
+    border-right: 1px solid var(--accent2);
+    opacity: 0.4;
 }
 
 /* ─── ABOUT ──────────────────────────────────────────────── */
@@ -296,7 +416,6 @@ section {
     height: 100%;
     object-position: top center;
     object-fit: contain;
-
 }
 
 .about-text p {
@@ -304,7 +423,6 @@ section {
     line-height: 1.9;
     color: var(--text);
     margin-bottom: 20px;
-
     opacity: 0.85;
 }
 
@@ -448,7 +566,6 @@ section {
     align-items: center;
     justify-content: center;
     background: rgba(0,230,118,.03);
-    
 }
 
 .project-body { padding: 24px; }
@@ -479,7 +596,6 @@ section {
     border-radius: 2px;
     border: 1px solid var(--border);
     color: var(--accent2);
-    
 }
 
 .project-links { display: flex; gap: 12px; }
@@ -540,7 +656,6 @@ section {
     color: var(--white);
     margin-top: 2px;
 }
-
 
 .contact-form { display: flex; flex-direction: column; gap: 16px; }
 
@@ -611,7 +726,7 @@ footer p {
 footer span { color: var(--accent); }
 
 .contact-alt-text {
-    color: var(--text-muted);
+    color: var(--muted);
     font-family: var(--font-mono);
     font-size: 13px;
     margin-bottom: 20px;
@@ -622,7 +737,7 @@ footer span { color: var(--accent); }
     align-items: center;
     gap: 16px;
     padding: 16px 20px;
-    background: var(--card-bg);
+    background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 8px;
     margin-bottom: 12px;
@@ -682,7 +797,9 @@ footer span { color: var(--accent); }
 @media (max-width: 900px) {
     .home { flex-direction: column-reverse; text-align: center; }
     .btn-box { justify-content: center; }
-    .home-image { width: 220px; height: 270px; }
+    .home-image-wrap { width: 240px; height: 284px; }
+    .photo-badge--tl { left: 0; top: -20px; }
+    .photo-badge--br { right: 0; bottom: -20px; }
     #about .about-grid { grid-template-columns: 1fr; }
     #contact .contact-wrapper { grid-template-columns: 1fr; }
     .info-cards { grid-template-columns: 1fr 1fr; }
